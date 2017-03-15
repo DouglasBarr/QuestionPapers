@@ -1,4 +1,4 @@
-
+ //<>// //<>//
 class QuestionPaper
 {
 
@@ -17,25 +17,36 @@ class QuestionPaper
     for (int i = 0; i < numberOfPapers; i++)
     {
       int paperNo = i + 1;
-      
+
       String questionPaperFileName = "BinaryToDecimalQuestions" + paperNo + ".pdf"; 
 
       drawQuestionPaper(questionPaperFileName);
 
-      String answerPaperFileName = "BinaryToDecimalAnswers" + paperNo + ".pdf";  //<>//
-      
-      drawAnswerPaper(answerPaperFileName); //<>//
+      String answerPaperFileName = "BinaryToDecimalAnswers" + paperNo + ".pdf"; 
+
+      drawAnswerPaper(answerPaperFileName);
 
       answers.clear();
     }
   }
 
-  private void drawQuestionPaper(String fileName)
+  private void setUpPaper(String fileName)
   {
     graphicsBuffer = createGraphics(595, 842, PDF, fileName);  // Size of an A4 sheet at 72dpi
     graphicsBuffer.beginDraw();
 
     graphicsBuffer.background(255);
+  }
+
+  private void closePaper()
+  {
+    graphicsBuffer.dispose();
+    graphicsBuffer.endDraw();
+  }
+
+  private void drawQuestionPaper(String fileName)
+  {
+    setUpPaper(fileName);
 
     //drawMarginGuides();
 
@@ -43,17 +54,7 @@ class QuestionPaper
 
     int yPos = topBottomMargin;
 
-    graphicsBuffer.textFont(firaLight);
-    graphicsBuffer.textSize(28);
-    graphicsBuffer.textAlign(LEFT, TOP);
-    graphicsBuffer.text(title, sideMargin, yPos);
-
-    yPos += 34;
-
-    graphicsBuffer.textSize(22);
-    graphicsBuffer.text(subTitle, sideMargin, yPos);
-
-    yPos += 70;
+    yPos = drawTitle(yPos, title);
 
     graphicsBuffer.textSize(18);
     graphicsBuffer.text("Convert the following binary numbers to decimal:", sideMargin, yPos);
@@ -67,17 +68,13 @@ class QuestionPaper
       drawQuestion (questionNumber, yPos);
       yPos += 40;
     }
-
-    graphicsBuffer.dispose();
-    graphicsBuffer.endDraw();
+    
+    closePaper();
   }
 
   private void drawAnswerPaper(String fileName)
   {
-    graphicsBuffer = createGraphics(595, 842, PDF, fileName);  // Size of an A4 sheet at 72dpi
-    graphicsBuffer.beginDraw();
-
-    graphicsBuffer.background(255);
+    setUpPaper(fileName);
 
     //drawMarginGuides();
 
@@ -85,10 +82,31 @@ class QuestionPaper
 
     int yPos = topBottomMargin;
 
+    yPos = drawTitle(yPos, title + " - Answers");
+
+    graphicsBuffer.textSize(18);
+    graphicsBuffer.text("The decimal values are:", sideMargin, yPos);
+
+    yPos += 55;
+
+
+    for (int questionNumber = 0; questionNumber < numberOfQuestions; questionNumber++)
+    {
+      drawAnswer (questionNumber, yPos);
+      yPos += 40;
+    }
+
+    closePaper();
+  }
+
+  private int drawTitle(int startingYoffset, String titleText)
+  {
+    int yPos = startingYoffset;
+
     graphicsBuffer.textFont(firaLight);
     graphicsBuffer.textSize(28);
     graphicsBuffer.textAlign(LEFT, TOP);
-    graphicsBuffer.text(title + " - Answers", sideMargin, yPos);
+    graphicsBuffer.text(titleText, sideMargin, yPos);
 
     yPos += 34;
 
@@ -97,21 +115,7 @@ class QuestionPaper
 
     yPos += 70;
 
-    graphicsBuffer.textSize(18);
-    graphicsBuffer.text("The decimal values are:", sideMargin, yPos);
-
-    yPos += 55;
-
-    //drawQuestion (1, yPos);
-
-    for (int questionNumber = 0; questionNumber < numberOfQuestions; questionNumber++)
-    {
-      drawAnswer (questionNumber, yPos);
-      yPos += 40;
-    }
-
-    graphicsBuffer.dispose();
-    graphicsBuffer.endDraw();
+    return yPos;
   }
 
   private void drawQuestion(int count, int yPos)
